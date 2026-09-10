@@ -1,0 +1,84 @@
+# FruitLearn AI Configuration
+project_name: "FruitLearn AI"
+slogan: "Learning Fruit Features Without Manual Labels"
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  splits_dir: "data/splits"
+  image_size: 256
+  num_classes: 12
+  classes:
+    - Apple_Good
+    - Apple_Bad
+    - Banana_Good
+    - Banana_Bad
+    - Guava_Good
+    - Guava_Bad
+    - Lime_Good
+    - Lime_Bad
+    - Orange_Good
+    - Orange_Bad
+    - Pomegranate_Good
+    - Pomegranate_Bad
+  splits:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+  seed: 42
+
+models:
+  baseline:
+    name: "ResNet-18"
+    batch_size: 128
+    learning_rate: 0.002
+    weight_decay: 0.0001
+    epochs: 15
+    quick_epochs: 2
+
+  mae:
+    name: "MAE"
+    patch_size: 16
+    mask_ratio: 0.75
+    embed_dim: 192
+    decoder_embed_dim: 96
+    depth: 6
+    decoder_depth: 4
+    num_heads: 6
+    batch_size: 128
+    learning_rate: 0.001
+    epochs: 15
+    quick_epochs: 2
+
+  dinov2:
+    name: "DINOv2"
+    backbone: "dinov2_vits14"
+    embed_dim: 384
+    batch_size: 128
+    learning_rate: 0.0005
+    epochs: 15
+    quick_epochs: 2
+
+  ibot:
+    name: "iBOT"
+    backbone: "vit_small_patch16_224"
+    embed_dim: 384
+    batch_size: 128
+    learning_rate: 0.0005
+    epochs: 15
+    quick_epochs: 2
+
+finetune:
+  batch_size: 128
+  learning_rate: 0.0003
+  epochs: 10
+  quick_epochs: 2
+  limited_label_ratios: [1.0, 0.2, 0.1]
+
+paths:
+  models_dir: "models"
+  results_dir: "results"
+  logs_dir: "results/logs"
+  checkpoints_dir: "results/checkpoints"
+  tables_dir: "results/tables"
+  figures_dir: "results/figures"

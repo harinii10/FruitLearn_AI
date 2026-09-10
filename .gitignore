@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch checkpoints and heavy datasets
+data/
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.engine
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints
+
+# IDEs & System files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
