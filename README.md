@@ -51,22 +51,36 @@ graph TD
 ![DINOv2 Architecture](results/figures/fig06_dinov2_architecture.png)
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Img as Input Fruit Image
-    participant Crop as Multi-Crop Augmenter
-    participant Stu as Student ViT-Base/14
-    participant Tea as Teacher ViT-Base/14 (EMA)
-    participant Loss as Cross-Entropy DINO Loss
+graph TD
+    classDef inputStyle fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b;
+    classDef cropStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;
+    classDef studentStyle fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#b71c1c;
+    classDef teacherStyle fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20;
+    classDef lossStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c;
 
-    Img->>Crop: Generate 2 Global Crops (224x224) + 8 Local Crops (96x96)
-    Crop->>Tea: Pass 2 Global Crops
-    Crop->>Stu: Pass All 10 Crops (Global + Local)
-    Tea->>Tea: Apply Center Bias (c) & Temperature Sharpening (\tau_t)
-    Stu->>Loss: Output Student Logits P_s
-    Tea->>Loss: Output Teacher Softmax Targets P_t
-    Loss->>Stu: Backpropagate Gradients to Student
-    Stu-->>Tea: Update Teacher Parameters via EMA (\theta_t \leftarrow \lambda \theta_t + (1-\lambda) \theta_s)
+    subgraph Data Input & Multi-Crop Generation
+        A["Input Fruit Image (224x224x3)"]:::inputStyle --> B["Multi-Crop Generator"]:::cropStyle
+        B -->|"2 Global Crops (224x224)"| C1["Global Views V_global"]:::cropStyle
+        B -->|"8 Local Crops (96x96)"| C2["Local Views V_local"]:::cropStyle
+    end
+
+    subgraph Student Network Branch
+        C1 --> D_Stu["Student ViT-Base/14 (All Crops)"]:::studentStyle
+        C2 --> D_Stu
+        D_Stu --> E_Stu["Student Logits Softmax P_s"]:::studentStyle
+    end
+
+    subgraph Teacher Network Branch (EMA)
+        C1 --> D_Tea["Teacher ViT-Base/14 (Global Crops Only)"]:::teacherStyle
+        D_Tea --> E_Tea["Center Offset c & Softmax Sharpening P_t"]:::teacherStyle
+    end
+
+    subgraph Loss Optimization
+        E_Stu --> F["Cross-Entropy DINO Loss H(P_t, P_s)"]:::lossStyle
+        E_Tea --> F
+        F -->|"Gradient Backprop"| D_Stu
+        D_Stu -.->|"EMA Update (lambda = 0.996)"| D_Tea
+    end
 ```
 
 ---
@@ -174,21 +188,7 @@ FruitLearn_AI_DINOv2/
 │   └── Paper05_Member1_DINOv2_Agricultural_Vision_2025.pdf
 │
 └── results/                            # Figures & Tables
-    └── figures/
-        ├── fig01_class_distribution.png
-        ├── fig02_sample_fruit_images.png
-        ├── fig03_augmentation_examples.png
-        ├── fig04_overall_system_architecture.png
-        ├── fig06_dinov2_architecture.png
-        ├── fig10_dinov2_convergence.png
-        ├── fig13_accuracy_comparison.png
-        ├── fig14_precision_comparison.png
-        ├── fig15_recall_comparison.png
-        ├── fig16_f1_score_comparison.png
-        ├── fig18_confusion_matrix_dinov2.png
-        ├── fig21_per_class_performance.png
-        ├── fig22_limited_label_experiment.png
-        └── fig23_ui_dashboard_mockup.jpg
+    └── figures/ (fig01 to fig23)
 ```
 
 ---
